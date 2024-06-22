@@ -1,9 +1,16 @@
-mod guess_word;
+use binary_tree::BinaryTree;
+
+mod binary_tree;
 
 fn main() {
-    let a = [111, 222, 333];
-    println!("Hello, world! {:?}", a);
-    let a = [3; 5];
-    println!("Hello, world! {:?}", a);
-    guess_word::guess_word();
+    let mut tree: BinaryTree<i32> = binary_tree::BinaryTree::new();
+    tree.insert(5);
+    tree.insert(3);
+    tree.insert(8);
+    tree.insert(1);
+    tree.insert(4);
+    tree.insert(4);
+    tree.insert(7);
+    tree.insert(9);
+    println!("Binary Tree: {:?}", tree);
 }
