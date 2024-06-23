@@ -42,12 +42,19 @@ impl<T: PartialEq + std::cmp::Ord> Node<T> {
 
 impl<T: PartialEq + std::cmp::Ord + std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+
+        // create a stack to store the nodes
         let mut stack = Vec::new();
-        stack.push((self.root.as_ref(), 0));
+        // push the root node and its level
+        stack.push((self.root.as_ref(), 0))
+        // loop through the stack;
         while let Some((node, level)) = stack.pop() {
+            // check if the node exists
             if let Some(node) = node {
+                // push the left and right nodes and their levels
                 stack.push((node.right.as_ref(), level + 1));
                 stack.push((node.left.as_ref(), level + 1));
+                // write the node's value
                 write!(f, "\n")?;
                 write!(f, "{:indent$}{:?}", "", node.value, indent = level * 2)?;
             }
