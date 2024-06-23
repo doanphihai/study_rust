@@ -1,3 +1,5 @@
+use std::{fmt::{format, Write}, str::FromStr};
+
 
 #[derive(Debug)] 
 struct Node<T> {
@@ -40,29 +42,6 @@ impl<T: PartialEq + std::cmp::Ord> Node<T> {
     }
 }
 
-impl<T: PartialEq + std::cmp::Ord + std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-
-        // create a stack to store the nodes
-        let mut stack = Vec::new();
-        // push the root node and its level
-        stack.push((self.root.as_ref(), 0))
-        // loop through the stack;
-        while let Some((node, level)) = stack.pop() {
-            // check if the node exists
-            if let Some(node) = node {
-                // push the left and right nodes and their levels
-                stack.push((node.right.as_ref(), level + 1));
-                stack.push((node.left.as_ref(), level + 1));
-                // write the node's value
-                write!(f, "\n")?;
-                write!(f, "{:indent$}{:?}", "", node.value, indent = level * 2)?;
-            }
-        }
-        Ok(())
-    }
-}
-
 pub(crate) struct BinaryTree<T> {
     root: Option<Box<Node<T>>>,
 }
@@ -81,3 +60,30 @@ impl<T: PartialEq + std::cmp::Ord> BinaryTree<T> {
     }
 }
 
+
+
+impl<T: std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut stack = vec![(&self.root, 0)];
+        let mut dir = String::new();
+        while let Some((node, level)) = stack.pop() {
+            match node {
+                Some(n) => {
+                    for _ in 0..level {
+                        write!(dir, "    ")?;
+                    }
+                    write!(dir, "├── {:?}\n", n.value)?;
+                    stack.push((&n.right, level + 1));
+                    stack.push((&n.left, level + 1));
+                }
+                None => {
+                    for _ in 0..level {
+                        write!(dir, "    ")?;
+                    }
+                    write!(dir, "└── null\n")?;
+                }
+            }
+        }
+        write!(f, "BinaryTree:\n{}", dir)
+    }
+}
