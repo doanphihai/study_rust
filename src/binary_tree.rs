@@ -30,11 +30,10 @@ impl<T: PartialEq + std::cmp::Ord> Node<T> {
             }
             // check if the value is greater or equal than the current node's value
             std::cmp::Ordering::Greater | std::cmp::Ordering::Equal => {
-                if let Some(right) = &mut self.right {
-                    right.insert(value);
-                }
-                else {
-                    self.right = Some(Box::new(Node::new(value)));
+                // Just want to write this in different ways
+                match &mut self.right {
+                    Some(right) =>  right.insert(value),
+                    None => self.right = Some(Box::new(Node::new(value))),
                 }
                 
             }
@@ -71,21 +70,21 @@ impl<T: std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
             match node {
                 // check if the node exists
                 Some(n) => {
-                    for _ in 0..level {
-                        write!(dir, "    ")?;
-                    }
-                    write!(dir, "├── {:?}\n", n.value)?;
+                    do_print(level, &mut dir, &n.value)?;
                     stack.push((&n.right, level + 1));
                     stack.push((&n.left, level + 1));
                 }
-                None => {
-                    // for _ in 0..level {
-                    //     write!(dir, "    ")?;
-                    // }
-                    // write!(dir, "└── null\n")?;
-                }
+                None => {}
             }
         }
         write!(f, "BinaryTree:\n{}", dir)
     }
+}
+
+fn do_print<T: std::fmt::Debug>(level: i32, padding: &mut String, n: &T) -> Result<(), std::fmt::Error> {
+    for _ in 0..level {
+        write!(padding, "    ")?;
+    }
+    write!(padding, "├── {:?}\n", n)?;
+    Ok(())
 }
