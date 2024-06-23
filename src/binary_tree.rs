@@ -66,8 +66,10 @@ impl<T: std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut stack = vec![(&self.root, 0)];
         let mut dir = String::new();
+        // iterate through the stack
         while let Some((node, level)) = stack.pop() {
             match node {
+                // check if the node exists
                 Some(n) => {
                     for _ in 0..level {
                         write!(dir, "    ")?;
@@ -77,10 +79,10 @@ impl<T: std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
                     stack.push((&n.left, level + 1));
                 }
                 None => {
-                    for _ in 0..level {
-                        write!(dir, "    ")?;
-                    }
-                    write!(dir, "└── null\n")?;
+                    // for _ in 0..level {
+                    //     write!(dir, "    ")?;
+                    // }
+                    // write!(dir, "└── null\n")?;
                 }
             }
         }
