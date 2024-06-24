@@ -39,13 +39,16 @@ impl<T: PartialEq + std::cmp::Ord> Node<T> {
             }
         }
     }
+
+    // search for a value in the tree in a interative way
+    
 }
 
 pub(crate) struct BinaryTree<T> {
     root: Option<Box<Node<T>>>,
 }
 
-impl<T: PartialEq + std::cmp::Ord> BinaryTree<T> {
+impl<T: PartialEq + std::cmp::Ord + Clone> BinaryTree<T> {
     pub(crate) fn new() -> BinaryTree<T> {
         BinaryTree { root: None }
     }
@@ -57,6 +60,17 @@ impl<T: PartialEq + std::cmp::Ord> BinaryTree<T> {
             self.root = Some(Box::new(Node::new(value)));
         }
     }
+
+    
+    pub(crate) fn search(&self, value: &T) -> bool {
+        traverse_until(&self.root, |v| v == *value).unwrap()
+    }
+
+    pub(crate) fn count_nodes(&self) -> usize {
+        traverse(&self.root, 0, 0, |_, c, d| (c, d+1)).unwrap()
+    }
+
+
 }
 
 
@@ -79,6 +93,7 @@ impl<T: std::fmt::Debug> std::fmt::Debug for BinaryTree<T> {
         }
         write!(f, "BinaryTree:\n{}", dir)
     }
+
 }
 
 fn do_print<T: std::fmt::Debug>(level: i32, padding: &mut String, n: &T) -> Result<(), std::fmt::Error> {
@@ -88,3 +103,37 @@ fn do_print<T: std::fmt::Debug>(level: i32, padding: &mut String, n: &T) -> Resu
     write!(padding, "├── {:?}\n", n)?;
     Ok(())
 }
+
+fn traverse<T, D: Clone, C: Clone>(node: &Option<Box<Node<T>>>, acc_value: D, init_value: C, apply: fn(&T, C, D) -> (C, D)) -> Result<D, std::fmt::Error> {
+    let mut acc = acc_value.clone();
+    let mut stack = vec![(node, init_value)];
+    while let Some((n, mut a)) = stack.pop() {
+        match n {
+            Some(n) => {
+                (a, acc) = apply(&n.value, a, acc.to_owned());
+                stack.push((&n.right, a.clone()));
+                stack.push((&n.left, a));
+            }
+            None => {}
+        }
+    }
+    Ok(acc)
+}
+
+fn traverse_until<T: Clone>(node: &Option<Box<Node<T>>>, apply: impl Fn(T) -> bool) -> Result<bool, std::fmt::Error> {
+    let mut stack = vec![node];
+    while let Some(n) = stack.pop() {
+        match n {
+            Some(n) => {
+                if apply(n.value.clone()) {
+                    return Ok(true);
+                }
+                stack.push(&n.right);
+                stack.push(&n.left);
+            }
+            None => {}
+        }
+    }
+    Ok(false)
+}
+
