@@ -1,4 +1,4 @@
-use std::fmt::Write;
+use std::{clone, fmt::Write};
 
 
 #[derive(Debug)] 
@@ -105,12 +105,12 @@ fn do_print<T: std::fmt::Debug>(level: i32, padding: &mut String, n: &T) -> Resu
 }
 
 fn traverse<T, D: Clone, C: Clone>(node: &Option<Box<Node<T>>>, acc_value: D, init_value: C, apply: fn(&T, C, D) -> (C, D)) -> Result<D, std::fmt::Error> {
-    let mut acc = acc_value.clone();
+    let mut acc = acc_value;
     let mut stack = vec![(node, init_value)];
     while let Some((n, mut a)) = stack.pop() {
         match n {
             Some(n) => {
-                (a, acc) = apply(&n.value, a, acc.to_owned());
+                (a, acc) = apply(&n.value, a, acc);
                 stack.push((&n.right, a.clone()));
                 stack.push((&n.left, a));
             }
